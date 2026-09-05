@@ -29,6 +29,21 @@ def test_per_cell_summary_row_count(small_df):
     assert per_cell["sample_count"].sum() == len(small_df)
 
 
+def test_per_cell_summary_keeps_site_coordinates_distinct(small_df):
+    """回歸測試:per_cell_summary 曾經把 site_lat/site_lon 一起四捨五入到
+    小數點後 1 位(約 11 公里精度),導致同一份模擬區域(半徑通常只有幾公里)
+    裡好幾個實際位置不同的小區,座標被壓成完全一樣,在地圖上疊成同一個點。
+    這裡驗證小區座標至少維持小數點後 3 位以上精度,不會被過度四捨五入。
+    """
+    per_cell = metrics.per_cell_summary(small_df)
+    # 檢查小數位數:轉成字串看小數點後有幾位數字
+    for col in ["site_lat", "site_lon"]:
+        decimals = per_cell[col].apply(
+            lambda v: len(str(v).split(".")[1]) if "." in str(v) else 0
+        )
+        assert (decimals >= 3).any(), f"{col} 精度看起來被過度四捨五入"
+
+
 def test_dropped_call_proxy_range(small_df):
     proxy = metrics.dropped_call_proxy(small_df, sinr_threshold_db=0.0)
     assert "dropped_call_proxy_pct" in proxy.columns

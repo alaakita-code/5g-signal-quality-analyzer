@@ -41,7 +41,16 @@ def per_cell_summary(df: pd.DataFrame) -> pd.DataFrame:
         )
         .reset_index()
     )
-    return grouped.round(1)
+    # 注意:訊號/負載指標四捨五入到小數點後 1 位方便閱讀,但經緯度
+    # (site_lat/site_lon)不能比照辦理——1 位小數的經緯度精度只有約
+    # 11 公里,遠粗於本專案模擬區域的半徑(通常幾公里),曾經因為這裡也
+    # 一起四捨五入到 1 位小數,導致好幾個實際位置不同的小區,座標被
+    # 壓成完全一樣,在地圖上疊成同一個點、文字標籤也擠在一起看不清楚。
+    # 經緯度改留 5 位小數(約 1 公尺精度),確保每個小區的位置不會被誤壓縮。
+    rounded = grouped.round(1)
+    rounded["site_lat"] = grouped["site_lat"].round(5)
+    rounded["site_lon"] = grouped["site_lon"].round(5)
+    return rounded
 
 
 def classify_quality(per_cell_df: pd.DataFrame, thresholds: dict) -> pd.DataFrame:
