@@ -133,14 +133,12 @@ def _plain_scatter(**kwargs):
         height=500,
         **kwargs,
     )
-    # 經緯度的實際距離比例不是 1:1(緯度越高,經度 1 度代表的實際距離越短),
-    # 這裡用資料的緯度中位數概略校正縱橫比,讓散佈圖的相對位置不會失真太多。
-    if len(df_) > 0:
-        import math
-
-        mean_lat = df_[lat_col].mean()
-        aspect_ratio = 1 / max(math.cos(math.radians(mean_lat)), 0.1)
-        fig.update_yaxes(scaleanchor="x", scaleratio=aspect_ratio)
+    # 注意:這裡刻意不鎖定 X/Y 軸的縱橫比例(scaleanchor)。原本想用
+    # scaleanchor 依緯度校正經緯度的實際距離比例,但在手機直向的窄容器下,
+    # Plotly 為了同時滿足「鎖定比例」與「塞進容器」兩個條件,會把可視範圍
+    # 縮到只剩極小一塊(資料點全部被擠出畫面外,看起來像空白地圖)。純座標
+    # 散佈圖本來就不是精確地圖,寧可犧牲一點縱橫比例的精確度,也要保證任何
+    # 裝置、任何螢幕比例下都看得到完整資料。
     fig.update_traces(
         marker=dict(line=dict(width=0.5, color="white")),
         textposition="top center",
@@ -351,7 +349,7 @@ def main() -> None:
                     title=f"頻寬影響(固定 {radio_cfg['num_antennas']} 天線)",
                     labels={"bandwidth_mhz": "頻寬(MHz)", "throughput_mbps": "估計吞吐量(Mbps)"},
                 )
-                st.plotly_chart(fig_bw, use_container_width=True)
+                st.plotly_chart(fig_bw, use_container_width=True, config={"displayModeBar": False})
             with col_ant:
                 ant_df = antenna_sensitivity(summary["avg_sinr_db"], radio_cfg["bandwidth_mhz"])
                 fig_ant = px.bar(
@@ -359,7 +357,7 @@ def main() -> None:
                     title=f"天線數影響(固定 {radio_cfg['bandwidth_mhz']}MHz)",
                     labels={"num_antennas": "MIMO 天線數", "throughput_mbps": "估計吞吐量(Mbps)"},
                 )
-                st.plotly_chart(fig_ant, use_container_width=True)
+                st.plotly_chart(fig_ant, use_container_width=True, config={"displayModeBar": False})
 
         st.subheader("小區地理分佈(依品質分類上色:良好/普通/需關注)")
         fig_map = _scatter_on_map(
@@ -378,7 +376,7 @@ def main() -> None:
             style=map_style,
         )
         fig_map.update_layout(margin=dict(l=0, r=0, t=0, b=0))
-        st.plotly_chart(fig_map, use_container_width=True)
+        st.plotly_chart(fig_map, use_container_width=True, config={"displayModeBar": False})
         st.caption(
             "每個點是一個小區,顏色代表品質分類(綠=良好、橘=普通、紅=需關注),"
             "點越大代表這個小區收集到的樣本數越多。把滑鼠移到點上可以看到細節數字。"
@@ -434,13 +432,13 @@ def main() -> None:
         fig_sinr = px.line(cell_ts, x="timestamp", y="sinr_db", title=f"{selected_cell} — SINR 隨時間變化")
         fig_load = px.line(cell_ts, x="timestamp", y="load_pct", title=f"{selected_cell} — 負載隨時間變化")
 
-        st.plotly_chart(fig_rsrp, use_container_width=True)
+        st.plotly_chart(fig_rsrp, use_container_width=True, config={"displayModeBar": False})
         st.caption("訊號強度是否隨時間忽高忽低。如果某個時段明顯下滑,可能跟當時的環境或距離有關。")
 
-        st.plotly_chart(fig_sinr, use_container_width=True)
+        st.plotly_chart(fig_sinr, use_container_width=True, config={"displayModeBar": False})
         st.caption("干擾程度是否隨時間變化。曲線越常往下掉,代表那個時段鄰近小區的干擾越明顯。")
 
-        st.plotly_chart(fig_load, use_container_width=True)
+        st.plotly_chart(fig_load, use_container_width=True, config={"displayModeBar": False})
         st.caption("忙碌程度隨時間的變化,通常會看到上下班時段有明顯的高峰。")
 
         st.subheader("簡易趨勢預測(線性迴歸)")
@@ -483,7 +481,7 @@ def main() -> None:
                 title=f"{selected_cell} — {forecast_metric} 趨勢預測(目前判斷:{direction})",
                 color_discrete_map={False: PRIMARY_COLOR, True: WARN_COLOR},
             )
-            st.plotly_chart(fig_forecast, use_container_width=True)
+            st.plotly_chart(fig_forecast, use_container_width=True, config={"displayModeBar": False})
             st.caption("藍線是歷史資料,橘線是模型外推的預測值;判斷趨勢用的是同一個線性迴歸模型的斜率方向。")
         except ValueError as e:
             st.warning(f"目前資料不足以預測:{e}")
@@ -526,7 +524,7 @@ def main() -> None:
                 style=map_style,
             )
             fig_hot.update_layout(margin=dict(l=0, r=0, t=0, b=0))
-            st.plotly_chart(fig_hot, use_container_width=True)
+            st.plotly_chart(fig_hot, use_container_width=True, config={"displayModeBar": False})
             st.caption("顏色越深、點越大,代表這個熱區聚集的問題樣本越多,越優先處理。")
 
         st.subheader("以小區平均值判斷的問題小區(門檻法,快速版)")
