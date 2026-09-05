@@ -1,10 +1,14 @@
 # 5G/4G 行動網路訊號品質分析儀
 
+**線上展示:** https://alaakita-5g-signal-quality-analyzer.streamlit.app/
+
 以模擬資料展示 4G/5G 基地台訊號品質(RSRP/RSRQ/SINR)、負載狀況的
 統計分析、熱區偵測、瓶頸識別與最佳化建議,並提供互動式 Streamlit 儀表板
 與一鍵 Markdown 報告輸出。
 
 > 目前資料來源為模擬資料,尚未接上真實路測資料集。
+
+部署流程與檢查清單見 [DEPLOYMENT.md](DEPLOYMENT.md)。
 
 ## 專案簡介
 
@@ -85,16 +89,11 @@ streamlit run src/dashboard/app.py
 
 ## 部署
 
-用 Streamlit Community Cloud 部署最簡單:
+已部署在 Streamlit Community Cloud:https://alaakita-5g-signal-quality-analyzer.streamlit.app/
 
-1. 推上 GitHub(私有 repo 即可)
-2. 到 [share.streamlit.io](https://share.streamlit.io) 用 GitHub 帳號登入
-3. 選擇這個 repo,主檔案路徑填 `src/dashboard/app.py`
-
-`runtime.txt` 與 `.streamlit/config.toml` 已配置好給 Streamlit Cloud 使用。
-
-也可以用容器部署(本機 Docker、或 Render / Railway 等平台),
-`docker/Dockerfile` 已提供。
+完整部署流程(GitHub 推送、CI 驗證、Streamlit Cloud 設定)見
+[DEPLOYMENT.md](DEPLOYMENT.md)。也可以用容器部署(本機 Docker、或
+Render / Railway 等平台),`docker/Dockerfile` 已提供。
 
 > 注意:Streamlit 需要長駐的 Python 進程,無法部署在 Cloudflare
 > Pages/Workers 這類無狀態的 edge function 平台上。
@@ -275,4 +274,3 @@ WebGL、並且能動態載入對應的 JS 模組,還要連到外部圖磚伺服�
 - 更完整的時間序列預測模型(目前是最基本的線性迴歸,可換成
   ARIMA、Prophet 等真正的時間序列模型)
 - OpenCelliD 真實基地台位置串接下載 API(目前只有清洗邏輯骨架)
-# 5g-signal-quality-analyzer
