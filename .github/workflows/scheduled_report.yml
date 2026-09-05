@@ -1,0 +1,48 @@
+name: 排程自動產生分析報告
+
+on:
+  schedule:
+    # 每天 UTC 00:00(台灣時間早上 8:00)自動跑一次
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+    inputs:
+      scenario:
+        description: "要套用的案例演示情境 id(留空則用純模擬參數)"
+        required: false
+        default: ""
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 取出程式碼
+        uses: actions/checkout@v4
+
+      - name: 設定 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: 安裝相依套件
+        run: pip install -r requirements.txt
+
+      - name: 產生報告
+        run: |
+          SCENARIO_ARG=""
+          if [ -n "${{ github.event.inputs.scenario }}" ]; then
+            SCENARIO_ARG="--scenario ${{ github.event.inputs.scenario }}"
+          fi
+          python scripts/generate_report_cli.py \
+            --config configs/default_config.yaml \
+            --output-dir reports_output \
+            --format both \
+            $SCENARIO_ARG
+
+      - name: 上傳報告(Artifact,保留 30 天)
+        uses: actions/upload-artifact@v4
+        with:
+          name: signal-quality-report-${{ github.run_id }}
+          path: reports_output/
+          retention-days: 30

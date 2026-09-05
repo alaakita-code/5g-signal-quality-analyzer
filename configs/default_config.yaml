@@ -1,0 +1,68 @@
+# =============================================================
+# 5G/4G 訊號品質分析儀 — 預設設定檔
+# =============================================================
+
+simulation:
+  # 基地台(小區)數量
+  num_cells: 12
+  # 每個基地台涵蓋的取樣點(用戶/量測點)數量
+  samples_per_cell: 30
+  # 模擬時間範圍
+  start_time: "2026-09-01 00:00:00"
+  end_time: "2026-09-01 23:55:00"
+  time_step_minutes: 5
+  # 模擬地理中心(範例:台北市中心)與涵蓋半徑(公里)
+  center_lat: 25.0478
+  center_lon: 121.5319
+  radius_km: 5.0            # 基地台散佈範圍(城市尺度)
+  cell_coverage_radius_km: 0.8   # 單一小區內取樣點的散佈半徑(較貼近都會巨集蜂巢覆蓋範圍)
+  random_seed: 42
+
+  # 路徑損耗模型參數(簡化版 Okumura-Hata 風格)
+  tx_power_dbm: 43.0          # 基地台發射功率
+  path_loss_exponent: 3.5     # 路徑損耗指數(都會區約 3.0~4.0)
+  shadowing_std_db: 6.0       # 陰影衰落標準差(log-normal)
+  fading_std_db: 2.0          # 小尺度衰落雜訊標準差
+
+  # 負載模擬:尖峰/離峰時段(24 小時制)
+  peak_hours: [8, 9, 12, 18, 19, 20, 21]
+  peak_load_range: [60, 100]     # 尖峰時段負載百分比範圍
+  offpeak_load_range: [5, 40]    # 離峰時段負載百分比範圍
+
+# 分析門檻值(用於熱區/瓶頸判斷)
+thresholds:
+  rsrp_poor_dbm: -110      # RSRP 低於此值視為訊號差
+  rsrp_fair_dbm: -95
+  rsrq_poor_db: -15
+  sinr_poor_db: 3          # SINR 低於此值視為干擾嚴重
+  sinr_fair_db: 10
+  load_high_pct: 80        # 負載高於此值視為高負載小區
+
+# 熱區偵測(聚類)參數
+hotspot:
+  method: "dbscan"          # dbscan 或 threshold
+  dbscan_eps_km: 0.5
+  dbscan_min_samples: 5
+
+# 儀表板顯示設定
+dashboard:
+  # 地圖底圖樣式。可選:
+  #   "open-street-map" — 需要瀏覽器能執行 WebGL 並動態載入 MapLibre GL 的
+  #                        JS 模組,還要連到外部圖磚伺服器下載底圖。部分
+  #                        公司網路/資安政策會擋掉這種動態載入的 JS 模組,
+  #                        導致地圖整個空白。
+  #   "white-bg"         — 一樣走 MapLibre GL 地圖元件,只是不畫街道底圖。
+  #                        仍然需要能動態載入 MapLibre GL 的 JS 模組,若你的
+  #                        環境連這個都空白,代表問題不是「圖磚下載被擋」,
+  #                        而是連地圖引擎本身的 JS 模組載入都被擋了。
+  #   "plain_scatter"    — 完全不使用地圖元件,把經緯度當一般座標畫成散佈圖。
+  #                        不需要 WebGL、不需要動態載入任何外部模組,任何
+  #                        環境都能正常顯示,是最保險的選項(沒有街道背景)。
+  # 若前兩個選項都顯示空白,請直接改用 "plain_scatter"。
+  map_style: "plain_scatter"
+
+# 檔案路徑
+paths:
+  raw_data_dir: "data/raw"
+  processed_data_dir: "data/processed"
+  report_output_dir: "reports_output"

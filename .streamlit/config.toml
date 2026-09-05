@@ -1,0 +1,19 @@
+# Streamlit 設定檔
+# 明確鎖定明亮主題,避免使用者瀏覽器/系統的深色模式偏好被 Streamlit 帶入,
+# 出現不符合設計規範的暗色介面(本專案規範:不使用暗色系/賽博龐克風格)。
+
+[theme]
+base = "light"
+primaryColor = "#2563eb"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f8fafc"
+textColor = "#1e293b"
+font = "sans serif"
+
+[server]
+# 限制上傳檔案大小(MB),避免使用者不小心上傳過大的 CSV 導致記憶體吃緊,
+# 尤其是部署在 Streamlit Community Cloud 等資源有限的免費方案上時。
+maxUploadSize = 50
+
+[browser]
+gatherUsageStats = false

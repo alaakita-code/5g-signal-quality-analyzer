@@ -1,0 +1,11 @@
+pandas>=2.0
+numpy>=1.24
+scikit-learn>=1.3
+pyyaml>=6.0
+streamlit>=1.35
+# plotly>=5.20 涵蓋新舊兩種地圖 API(scatter_map / scatter_mapbox),
+# src/dashboard/app.py 的 _scatter_on_map() 用 hasattr 動態判斷,
+# 不論裝到哪個版本都能運作,不需要額外鎖版號上限。
+plotly>=5.20
+reportlab>=4.0
+pytest>=8.0

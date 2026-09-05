@@ -1,0 +1,25 @@
+字型來源與授權
+================
+
+assets/fonts/WenQuanYiZenHei-Subset.ttf
+
+本檔案是從 WenQuanYi Zen Hei(文泉驛正黑)字型抽取出的子集,只保留
+本專案 PDF 報告(src/reports/report_generator.py)實際會用到的字元
+(繁體中文常用字 + 全形標點 + 完整 ASCII 字元),原始字型約 4MB,
+子集後約 54KB。
+
+原始字型:WenQuanYi Zen Hei(文泉驛正黑)
+來源:http://wenq.org/
+著作權:2007-2009 Qianqian Fang 與 The WenQuanYi Project Board of Trustees 等
+授權條款:GPL-2 with Font Embedding Exception
+
+「Font Embedding Exception」條款明確允許:只要是把這個字型(或其子集)
+嵌入到你自己產生的文件(如本專案產生的 PDF)裡,該文件本身不會因此
+被要求以 GPL 授權釋出——但如果要重新散布「字型檔案本身」(不是嵌入
+文件裡),仍須遵守 GPL-2 條款。
+
+若要重新產生這個子集檔案(例如新增了子集裡沒有的中文字),需要:
+1. 一套包含 glyf(TrueType 輪廓,而非 CFF/PostScript 輪廓)的中文字型
+   (reportlab 的 TTFont 不支援 CFF 輪廓字型,WenQuanYi Zen Hei 剛好是
+   glyf 輪廓,Noto Sans CJK 系列則是 CFF 輪廓,不能直接用)
+2. 使用 fontTools 的 subset 模組,依實際用到的字元清單抽取子集
